@@ -67,3 +67,41 @@ TEST(MathUtil, SaturatingCast)
   EXPECT_EQ(16777216, MathUtil::SaturatingCast<s32>(float(16777216)));
   EXPECT_EQ(16777216, MathUtil::SaturatingCast<s32>(float(16777217)));
 }
+
+TEST(MathUtil, RunningMeanUnsigned)
+{
+  MathUtil::RunningMean<u64> mean;
+  mean.Push(10);
+  EXPECT_EQ(mean.Mean(), 10);
+  EXPECT_EQ(mean.Count(), 1);
+
+  mean.Push(30);
+  EXPECT_EQ(mean.Mean(), 20);
+  EXPECT_EQ(mean.Count(), 2);
+
+  mean.Push(5);
+  // This assertion fails: `x` is less than `m_mean`, so `(x - m_mean)` overflows, since our value
+  // type is unsigned.
+  EXPECT_EQ(mean.Mean(), 15);
+  EXPECT_EQ(mean.Count(), 3);
+}
+
+TEST(MathUtil, RunningMeanSigned)
+{
+  MathUtil::RunningMean<s64> mean;
+  mean.Push(10);
+  EXPECT_EQ(mean.Mean(), 10);
+  EXPECT_EQ(mean.Count(), 1);
+
+  mean.Push(30);
+  EXPECT_EQ(mean.Mean(), 20);
+  EXPECT_EQ(mean.Count(), 2);
+
+  mean.Push(5);
+  // This assertion also fails! Even though `(x - m_mean)` is -5 as expected, that value gets
+  // converted to the unsigned `size_t` type when we divide it by `++m_count` and overflows. This
+  // page documents the conversion behavior:
+  // https://en.cppreference.com/w/cpp/language/usual_arithmetic_conversions.
+  EXPECT_EQ(mean.Mean(), 15);
+  EXPECT_EQ(mean.Count(), 3);
+}
