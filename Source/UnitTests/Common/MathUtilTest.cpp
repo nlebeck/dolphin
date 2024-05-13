@@ -67,3 +67,30 @@ TEST(MathUtil, SaturatingCast)
   EXPECT_EQ(16777216, MathUtil::SaturatingCast<s32>(float(16777216)));
   EXPECT_EQ(16777216, MathUtil::SaturatingCast<s32>(float(16777217)));
 }
+
+TEST(MathUtil, RectangleEquality)
+{
+  MathUtil::Rectangle<int> rect_a(1, 1, 4, 7);
+  MathUtil::Rectangle<int> rect_b(1, 1, 4, 7);
+  EXPECT_EQ(rect_a, rect_b);
+
+  // Left not equal
+  MathUtil::Rectangle<int> rect_c(0, 1, 4, 7);
+  EXPECT_NE(rect_a, rect_c);
+
+  // Top not equal
+  MathUtil::Rectangle<int> rect_d(1, 3, 4, 7);
+  EXPECT_NE(rect_a, rect_d);
+
+  // Right not equal
+  MathUtil::Rectangle<int> rect_e(1, 1, 2, 7);
+  EXPECT_NE(rect_a, rect_e);
+
+  // Bottom not equal
+  MathUtil::Rectangle<int> rect_f(1, 1, 4, 9);
+  EXPECT_NE(rect_a, rect_f);
+
+  // Nothing equal
+  MathUtil::Rectangle<int> rect_g(0, 3, 2, 9);
+  EXPECT_NE(rect_a, rect_g);
+}
