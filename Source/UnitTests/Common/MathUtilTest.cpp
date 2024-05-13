@@ -67,3 +67,93 @@ TEST(MathUtil, SaturatingCast)
   EXPECT_EQ(16777216, MathUtil::SaturatingCast<s32>(float(16777216)));
   EXPECT_EQ(16777216, MathUtil::SaturatingCast<s32>(float(16777217)));
 }
+
+TEST(MathUtil, RectangleEquality)
+{
+  MathUtil::Rectangle<int> rect_a(1, 1, 4, 7);
+  MathUtil::Rectangle<int> rect_b(1, 1, 4, 7);
+  EXPECT_EQ(rect_a, rect_b);
+
+  // Left not equal
+  MathUtil::Rectangle<int> rect_c(0, 1, 4, 7);
+  EXPECT_NE(rect_a, rect_c);
+
+  // Top not equal
+  MathUtil::Rectangle<int> rect_d(1, 3, 4, 7);
+  EXPECT_NE(rect_a, rect_d);
+
+  // Right not equal
+  MathUtil::Rectangle<int> rect_e(1, 1, 2, 7);
+  EXPECT_NE(rect_a, rect_e);
+
+  // Bottom not equal
+  MathUtil::Rectangle<int> rect_f(1, 1, 4, 9);
+  EXPECT_NE(rect_a, rect_f);
+
+  // No coordinates equal
+  MathUtil::Rectangle<int> rect_g(0, 3, 2, 9);
+  EXPECT_NE(rect_a, rect_g);
+}
+
+TEST(MathUtil, RectangleGetWidthSigned)
+{
+  // left < right
+  MathUtil::Rectangle<int> rect_a(2, 1, 3, 2);
+  EXPECT_EQ(rect_a.GetWidth(), 1);
+
+  // left > right
+  MathUtil::Rectangle<int> rect_b(3, 1, 1, 2);
+  EXPECT_EQ(rect_b.GetWidth(), 2);
+
+  // left == right
+  MathUtil::Rectangle<int> rect_c(3, 1, 3, 2);
+  EXPECT_EQ(rect_c.GetWidth(), 0);
+}
+
+TEST(MathUtil, RectangleGetWidthUnsigned)
+{
+  // left < right
+  MathUtil::Rectangle<u32> rect_a(1, 1, 6, 2);
+  EXPECT_EQ(rect_a.GetWidth(), u32{5});
+
+  // left > right
+  MathUtil::Rectangle<u32> rect_b(5, 1, 1, 2);
+  EXPECT_EQ(rect_b.GetWidth(), u32{4});
+
+  // left == right
+  MathUtil::Rectangle<u32> rect_c(1, 2, 1, 2);
+  EXPECT_EQ(rect_c.GetWidth(), u32{0});
+}
+
+TEST(MathUtil, RectangleGetHeightSigned)
+{
+  // top < bottom
+  MathUtil::Rectangle<int> rect_a(1, 1, 2, 3);
+  EXPECT_EQ(rect_a.GetHeight(), 2);
+
+  // top > bottom
+  MathUtil::Rectangle<int> rect_b(1, 4, 2, 0);
+  EXPECT_EQ(rect_b.GetHeight(), 4);
+
+  // top == bottom
+  MathUtil::Rectangle<int> rect_c(1, 3, 2, 3);
+  EXPECT_EQ(rect_c.GetHeight(), 0);
+}
+
+TEST(MathUtil, RectangleGetHeightUnsigned)
+{
+  // top < bottom
+  MathUtil::Rectangle<u32> rect_a(1, 1, 2, 2);
+  EXPECT_EQ(rect_a.GetHeight(), u32{1});
+
+  // top > bottom
+  MathUtil::Rectangle<u32> rect_b(1, 4, 2, 2);
+  EXPECT_EQ(rect_b.GetHeight(), u32{2});
+
+  // top == bottom
+  MathUtil::Rectangle<u32> rect_c(1, 1, 2, 1);
+  EXPECT_EQ(rect_c.GetHeight(), u32{0});
+}
+
+// TODO: Add unit test coverage for `Rectangle::ClampUL`. (And consider removing
+// `Rectangle::ClampLL`, which does not have any callers.)
